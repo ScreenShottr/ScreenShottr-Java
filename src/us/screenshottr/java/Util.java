@@ -27,10 +27,11 @@ public class Util {
     }
 
     public static void handleError(Throwable ex) {
-        LOGGER.log(Level.SEVERE, null, ex);
+        final String stacktrace = getStackTrace(ex);
+        LOGGER.log(Level.SEVERE, stacktrace);
         JOptionPane.showMessageDialog(new JFrame(),
-                "An error occured whilst handling screenshots:\n"
-                + getStackTrace(ex),
+                "An error occured whilst making screenshot:\n"
+                + stacktrace,
                 "An error occured",
                 JOptionPane.ERROR_MESSAGE);
         System.exit(1);

@@ -38,7 +38,7 @@ public class Painter implements Runnable {
 
     @Override
     public void run() { // Start app
-        ScreenShottr.LOGGER.info("Initializing components");
+        ScreenShottr.LOGGER.info("Initializing components...");
 
         final Cursor cursor = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
 

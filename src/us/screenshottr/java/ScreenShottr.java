@@ -18,7 +18,7 @@ public class ScreenShottr {
 
     public static void main(String[] args) {
 
-        LOGGER.info("Starting ScreenShottr");
+        LOGGER.info("Starting ScreenShottr...");
 
         // Verify translucency
         Util.verifyTranslucencySupported();

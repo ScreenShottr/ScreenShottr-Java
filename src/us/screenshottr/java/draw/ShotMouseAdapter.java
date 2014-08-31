@@ -5,6 +5,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import us.screenshottr.java.ImageCapturer;
 import us.screenshottr.java.ScreenShottr;
+import us.screenshottr.java.Util;
 
 public class ShotMouseAdapter extends MouseAdapter {
 
@@ -22,16 +23,29 @@ public class ShotMouseAdapter extends MouseAdapter {
     public void mousePressed(MouseEvent event) {
         if (event.getButton() == MouseEvent.BUTTON2) {
             painter.exit();
+            return;
         }
 
-        this.startPoint = event.getLocationOnScreen();
+        startPoint = event.getLocationOnScreen();
     }
 
     @Override
     public void mouseReleased(MouseEvent event) {
-        this.endPoint = event.getLocationOnScreen();
-        painter.exit();
-        ImageCapturer.takeScreenShot(startPoint, endPoint);
+        try {
+            endPoint = event.getLocationOnScreen();
+
+            painter.exit();
+
+            if (Math.abs(endPoint.x - startPoint.x) < 15
+                    && Math.abs(endPoint.y - startPoint.y) < 15) {
+                ScreenShottr.LOGGER.warning("Cancelled: Image too small");
+                return;
+            }
+
+            ImageCapturer.takeScreenShot(startPoint, endPoint);
+        } catch (Exception ex) {
+            Util.handleError(ex);
+        }
     }
 
     public Point getStartPoint() {
