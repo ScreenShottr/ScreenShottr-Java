@@ -1,29 +1,23 @@
 package us.screenshottr.java.draw;
 
 import java.awt.AlphaComposite;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.MouseInfo;
-import java.awt.MultipleGradientPaint.CycleMethod;
-import java.awt.Paint;
 import java.awt.Point;
-import java.awt.RadialGradientPaint;
 import java.awt.Toolkit;
-import java.awt.geom.Point2D;
 import javax.swing.JPanel;
 
 public class ShotPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
     //
-    private Painter painter;
+    private ShotPainter painter;
     private ShotMouseAdapter mouseAdapter;
 
-    public ShotPanel(Painter painter) {
+    public ShotPanel(ShotPainter painter) {
         final Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
         super.setMinimumSize(size);
         super.setMaximumSize(size);
@@ -42,28 +36,40 @@ public class ShotPanel extends JPanel {
     protected void paintComponent(Graphics graphics) {
         final Graphics2D screen = (Graphics2D) graphics.create();
 
+        // TODO: Fix this
+        // Hacky: Draw a light (nearly invisible) full screen composite to keep the screen full-size
         screen.setComposite(AlphaComposite.Src.derive(0.002f));
         screen.fillRect(0, 0, getPreferredSize().width, getPreferredSize().height);
 
         // Get points
         final Point startPoint = mouseAdapter.getStartPoint();
+        final Point mousePoint = MouseInfo.getPointerInfo().getLocation();
         if (startPoint == null) {
             return;
         }
-        final Point mousePoint = MouseInfo.getPointerInfo().getLocation();
 
-        final int dimX = mousePoint.x - startPoint.x;
-        final int dimY = mousePoint.y - startPoint.y;
+        final int x = Math.min(startPoint.x, mousePoint.x);
+        final int y = Math.min(startPoint.y, mousePoint.y);
+        final int width = Math.max(startPoint.x, mousePoint.x) - x;
+        final int height = Math.max(startPoint.y, mousePoint.y) - y;
 
         // Draw selection
         screen.setComposite(AlphaComposite.SrcOver.derive(0.3f));
-        screen.fillRect(startPoint.x, startPoint.y, dimX, dimY);
+        screen.fillRect(x, y, width, height);
+
+        // Reset
+        screen.setColor(Color.WHITE);
+        screen.setComposite(AlphaComposite.SrcOver);
 
         // Draw dimensions
-        screen.setColor(Color.WHITE);
-        screen.setComposite(AlphaComposite.Src);
-        screen.drawString(String.valueOf(dimY), mousePoint.x - 40, mousePoint.y - 26);
-        screen.drawString(String.valueOf(dimX), mousePoint.x - 40, mousePoint.y - 14);
+        if (width > 40 && height > 40) {
+            int drawX = x + width - 33;
+            int drawY = y + height - 25;
+            int newLine = 12;
+            screen.drawString(String.valueOf(width), drawX, drawY);
+            screen.drawString(String.valueOf(height), drawX, drawY + newLine);
+        }
+
 
         screen.dispose();
     }
