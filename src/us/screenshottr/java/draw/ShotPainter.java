@@ -3,6 +3,8 @@ package us.screenshottr.java.draw;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Image;
+import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.Timer;
 import us.screenshottr.java.ScreenShottr;
@@ -11,6 +13,7 @@ import us.screenshottr.java.api.IStoppable;
 public class ShotPainter implements Runnable, IStoppable {
 
     private final ScreenShottr app;
+    private final Image icon;
     private final JFrame parentFrame;
     private final ShotPanel shotPanel;
     private final Timer timer;
@@ -18,6 +21,7 @@ public class ShotPainter implements Runnable, IStoppable {
 
     public ShotPainter(ScreenShottr app) {
         this.app = app;
+        this.icon = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/resources/screenshottr.png"));
         this.parentFrame = new JFrame();
         this.shotPanel = new ShotPanel(this);
         this.timer = new ShotRepaintTimer(parentFrame);
@@ -30,6 +34,7 @@ public class ShotPainter implements Runnable, IStoppable {
         ScreenShottr.LOGGER.info("Cursor: " + cursor.getName());
 
         // Frame
+        parentFrame.setIconImage(icon);
         parentFrame.setContentPane(shotPanel);
         parentFrame.setLayout(new BorderLayout());
         parentFrame.setUndecorated(true);
