@@ -1,4 +1,4 @@
-package us.screenshottr.java.draw;
+package us.screenshottr.java.render;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -9,52 +9,63 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Toolkit;
 import javax.swing.JPanel;
+import us.screenshottr.java.config.ConfigKey;
+import us.screenshottr.java.render.menu.ShotMenu;
 
-public class ShotPanel extends JPanel {
+public class ShotFullscreenPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
     //
-    private ShotPainter painter;
-    private ShotMouseAdapter mouseAdapter;
+    private final ShotPainter painter;
+    private final ShotMenu menuBar;
 
-    public ShotPanel(ShotPainter painter) {
+    public ShotFullscreenPanel(ShotPainter painter) {
+        this.painter = painter;
+
+        // Set size
         final Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
         super.setMinimumSize(size);
-        super.setMaximumSize(size);
         super.setPreferredSize(size);
 
-        this.painter = painter;
-        this.mouseAdapter = new ShotMouseAdapter(painter);
-        super.addMouseListener(mouseAdapter);
-    }
-
-    public ShotMouseAdapter getMouseAdapter() {
-        return mouseAdapter;
+        // Menu
+        this.menuBar = new ShotMenu(painter);
     }
 
     @Override
     protected void paintComponent(Graphics graphics) {
         final Graphics2D screen = (Graphics2D) graphics.create();
 
-        // TODO: Fix this
-        // Hacky: Draw a light (nearly invisible) full screen composite to keep the screen full-size
-        screen.setComposite(AlphaComposite.Src.derive(0.002f));
-        screen.fillRect(0, 0, getPreferredSize().width, getPreferredSize().height);
-
-        // Get points
-        final Point startPoint = mouseAdapter.getStartPoint();
-        final Point mousePoint = MouseInfo.getPointerInfo().getLocation();
-        if (startPoint == null) {
+        if (painter.getSettings().areSettingsVisible()) {
+            screen.setComposite(AlphaComposite.Src.derive(0.4f));
+            screen.fillRect(0, 0, getSize().width, getSize().height);
+            screen.dispose();
             return;
         }
 
+        //TODO: Fix this
+        // Hacky: Draw a light (nearly invisible) full screen composite to keep the screen full-size
+        screen.setComposite(AlphaComposite.Src.derive(0.002f));
+        screen.fillRect(0, 0, getSize().width, getSize().height);
+
+        // Get points
+        final Point startPoint = painter.getMouseAdapter().getStartPoint();
+        final Point mousePoint = MouseInfo.getPointerInfo().getLocation();
+
+        menuBar.paintComponent(graphics);
+
+        if (startPoint == null) { // Can't draw yet
+            screen.dispose();
+            return;
+        }
+
+        // Draw selection
         final int x = Math.min(startPoint.x, mousePoint.x);
         final int y = Math.min(startPoint.y, mousePoint.y);
         final int width = Math.max(startPoint.x, mousePoint.x) - x;
         final int height = Math.max(startPoint.y, mousePoint.y) - y;
 
         // Draw selection
-        screen.setComposite(AlphaComposite.SrcOver.derive(0.3f));
+        screen.setComposite(AlphaComposite.SrcOver.derive(painter.getApp().getConfig().getFloat(ConfigKey.OPACITY)));
         screen.fillRect(x, y, width, height);
 
         // Reset
@@ -70,7 +81,14 @@ public class ShotPanel extends JPanel {
             screen.drawString(String.valueOf(height), drawX, drawY + newLine);
         }
 
-
         screen.dispose();
+    }
+
+    public ShotPainter getPainter() {
+        return painter;
+    }
+
+    public ShotMenu getMenuBar() {
+        return menuBar;
     }
 }

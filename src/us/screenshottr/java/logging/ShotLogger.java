@@ -3,7 +3,6 @@ package us.screenshottr.java.logging;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import us.screenshottr.java.ScreenShottr;
-import static us.screenshottr.java.ScreenShottr.LOGGER;
 
 public class ShotLogger {
 

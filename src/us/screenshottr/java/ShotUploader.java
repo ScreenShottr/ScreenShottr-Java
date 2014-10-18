@@ -6,10 +6,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import javax.imageio.ImageIO;
-import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -17,26 +15,19 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicHeader;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 public class ShotUploader {
 
-    public static final URL UPLOAD_URL;
     public static final String USER_AGENT = "ScreenShottr/" + ScreenShottr.VERSION;
-    public static final String ERROR_RESPONSE = "https://www.screenshottr.us/error?type=error";
-    public static final String INVALID_RESPONSE = "https://www.screenshottr.us/error?type=invalid";
+    @Deprecated
+    public static final String RESPONSE_ERROR = "https://www.screenshottr.us/error?type=error";
+    @Deprecated
+    public static final String RESPONSE_INVALID = "https://www.screenshottr.us/error?type=invalid";
 
-    static {
-        URL tempUrl = null;
-        try {
-            tempUrl = new URL("https://screenshottr.us/upload"); //?base64=true
-        } catch (MalformedURLException ex) {
-            ShotUtil.handleError(ex);
-        }
-
-        UPLOAD_URL = tempUrl;
-    }
-
-    public static String uploadScreenShot(BufferedImage image) {
+    public static JSONObject uploadScreenShot(BufferedImage image, URL url) {
 
         final byte[] bytes = getBytes(image);
 
@@ -44,17 +35,15 @@ public class ShotUploader {
 
         try {
             try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
-                final HttpPost postRequest = new HttpPost(UPLOAD_URL.toURI());
+                final HttpPost postRequest = new HttpPost(url.toURI());
+                postRequest.setHeader(new BasicHeader("User-Agent", USER_AGENT));
 
-                // Format multipart
-                final MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-                builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-                builder.setBoundary("----BOUNDARYBOUNDARY----");
-                builder.addBinaryBody("imagedata", bytes, ContentType.create("image/png"), "gyazo.com"); //builder.addBinaryBody("imagedata", bytes);
-
-                final HttpEntity entity = builder.build();
-
-                postRequest.setEntity(entity);
+                // Add multipart
+                postRequest.setEntity(MultipartEntityBuilder
+                        .create()
+                        .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
+                        .addBinaryBody("imagedata", bytes, ContentType.create("image/png"), "gyazo.com")
+                        .build());
 
                 try (final CloseableHttpResponse response = client.execute(postRequest)) {
                     if (response.getStatusLine().getStatusCode() != 200) {
@@ -63,16 +52,15 @@ public class ShotUploader {
 
                     final String responseString = readStream(response.getEntity().getContent());
 
-                    ScreenShottr.LOGGER.info("URL: " + responseString);
-
-                    return responseString;
+                    ScreenShottr.LOGGER.info("Response: " + responseString);
+                    return (JSONObject) JSONValue.parse(responseString);
                 }
             }
         } catch (Throwable ex) {
             ShotUtil.handleError(ex);
         }
 
-        ShotUtil.handleError(new IllegalStateException("Shouln't get here."));
+        ShotUtil.handleError(new IllegalStateException("Shouldn't get here."));
         return null;
     }
 
