@@ -50,6 +50,7 @@ public class ShotMenu extends JComponent {
         screencapButton.setMouseClickHandler(new ShotRunnable(painter) {
             @Override
             public void run() {
+                painter.stop(0);
                 ShotCreator.handleScreenShot(painter, new Point(0, 0), new Point(parentFrame.getSize().width, parentFrame.getSize().height));
             }
         });
