@@ -7,9 +7,10 @@ import javax.swing.Timer;
 public class ShotRepaintTimer extends Timer {
 
     private static final long serialVersionUID = 1L;
+    public static int FPS = 20;
 
     public ShotRepaintTimer(final ShotPainter painter) {
-        super(20, new ActionListener() {
+        super(FPS, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
                 painter.getParentFrame().repaint();

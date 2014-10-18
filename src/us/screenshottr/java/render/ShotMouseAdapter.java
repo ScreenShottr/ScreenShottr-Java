@@ -3,7 +3,6 @@ package us.screenshottr.java.render;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import us.screenshottr.java.ScreenShottr;
 import us.screenshottr.java.ShotCreator;
 import us.screenshottr.java.ShotUtil;
 import us.screenshottr.java.api.IMouseAdapter;
@@ -50,6 +49,17 @@ public class ShotMouseAdapter extends MouseAdapter implements IMouseAdapter {
 
     @Override
     public void mousePressed(MouseEvent event) {
+        event.consume();
+
+        if (event.getButton() == MouseEvent.BUTTON3) {
+            startPoint = null;
+            return;
+        }
+
+        if (event.getButton() != MouseEvent.BUTTON1) {
+            return;
+        }
+
         if (painter.getContentPanel().getMenuBar().isVisible()) {
             for (ShotMenuButton button : painter.getContentPanel().getMenuBar().getButtons()) {
                 if (button.isMouseOver()) {
@@ -57,13 +67,6 @@ public class ShotMouseAdapter extends MouseAdapter implements IMouseAdapter {
                     return;
                 }
             }
-        }
-
-        if (event.getButton() == MouseEvent.BUTTON3) {
-            ScreenShottr.LOGGER.info("Caught RMB; exiting...");
-            event.consume();
-            painter.getApp().stop(0);
-            return;
         }
 
         startPoint = event.getLocationOnScreen();

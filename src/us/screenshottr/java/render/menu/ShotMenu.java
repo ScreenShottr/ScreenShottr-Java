@@ -11,7 +11,7 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import us.screenshottr.java.ShotCreator;
-import us.screenshottr.java.render.ShotMouseAdapter;
+import us.screenshottr.java.api.IMouseAdapter;
 import us.screenshottr.java.render.ShotPainter;
 
 public class ShotMenu extends JComponent {
@@ -22,7 +22,7 @@ public class ShotMenu extends JComponent {
     //
     private final ShotPainter painter;
     private final JFrame parentFrame;
-    private final ShotMouseAdapter mouseAdapter;
+    private final IMouseAdapter mouseAdapter;
     private final List<ShotMenuButton> buttons;
     private final Rectangle background;
 

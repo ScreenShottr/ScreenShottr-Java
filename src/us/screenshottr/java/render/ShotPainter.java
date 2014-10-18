@@ -1,13 +1,16 @@
 package us.screenshottr.java.render;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import us.screenshottr.java.ScreenShottr;
 import us.screenshottr.java.ShotUtil;
+import us.screenshottr.java.api.IMouseAdapter;
 import us.screenshottr.java.api.IStartStoppable;
 import us.screenshottr.java.render.settings.ShotSettings;
 
@@ -21,7 +24,7 @@ public class ShotPainter implements Runnable, IStartStoppable {
     private final JFrame parentFrame;
     private final ShotMouseAdapter mouseAdapter;
     private final ShotFullscreenPanel contentPanel;
-    private final ShotRepaintTimer timer;
+    private final Timer timer;
     private final ShotSettings settings;
 
     public ShotPainter(ScreenShottr app) {
@@ -38,23 +41,39 @@ public class ShotPainter implements Runnable, IStartStoppable {
         ScreenShottr.LOGGER.info("Initializing components...");
         ScreenShottr.LOGGER.info("Cursor: " + DEFAULT_CURSOR.getName());
 
-        // Frame
-        parentFrame.setIconImage(ICON);
-        parentFrame.setContentPane(contentPanel);
-        parentFrame.setLayout(new BorderLayout());
+        final Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
+
         parentFrame.setUndecorated(true);
-        parentFrame.setBackground(new Color(0, 0, 0, 0));
+        //
+        parentFrame.setLocation(0, 0);
+        parentFrame.setSize(size);
+        parentFrame.setMinimumSize(size);
+        parentFrame.setLayout(null);
+        parentFrame.setBackground(new Color(0, 0, 0, 0.002f)); //TODO: Hacky hacky
+        //
+        parentFrame.setIconImage(ICON);
         parentFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         parentFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         parentFrame.setAlwaysOnTop(true);
         parentFrame.setCursor(DEFAULT_CURSOR);
+        parentFrame.setLocationByPlatform(true);
+        parentFrame.setResizable(false);
+
+        // Content panel
+        contentPanel.setLocation(0, 0);
+        contentPanel.setSize(size);
+        contentPanel.setMinimumSize(size);
+        contentPanel.setLayout(null);
+        contentPanel.setBackground(new Color(0, 0, 0, 0));
+        parentFrame.add(contentPanel);
 
         // Mouse adapter
         parentFrame.addMouseListener(mouseAdapter);
         parentFrame.addMouseMotionListener(mouseAdapter);
 
         // Start showing the frame
-        parentFrame.pack();
+        //parentFrame.pack();
+        //parentFrame.revalidate();
         parentFrame.setVisible(true);
 
         // Start repainting
@@ -86,7 +105,7 @@ public class ShotPainter implements Runnable, IStartStoppable {
         return contentPanel;
     }
 
-    public ShotMouseAdapter getMouseAdapter() {
+    public IMouseAdapter getMouseAdapter() {
         return mouseAdapter;
     }
 

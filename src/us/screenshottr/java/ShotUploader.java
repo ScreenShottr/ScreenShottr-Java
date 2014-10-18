@@ -42,7 +42,7 @@ public class ShotUploader {
                 postRequest.setEntity(MultipartEntityBuilder
                         .create()
                         .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
-                        .addBinaryBody("imagedata", bytes, ContentType.create("image/png"), "gyazo.com")
+                        .addBinaryBody("imagedata", bytes, ContentType.create("image/png"), ShotURL.base)
                         .build());
 
                 try (final CloseableHttpResponse response = client.execute(postRequest)) {

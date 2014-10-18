@@ -2,6 +2,7 @@ package us.screenshottr.java;
 
 import java.io.File;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.UIManager;
 import us.screenshottr.java.api.IApplication;
 import us.screenshottr.java.api.IConfiguration;
@@ -39,6 +40,7 @@ public class ScreenShottr implements IApplication {
         ShotUtil.verifyTranslucencySupported();
 
         // LNF
+        JFrame.setDefaultLookAndFeelDecorated(false);
         ShotUtil.setLookAndFeel();
         ScreenShottr.LOGGER.info("LNF: " + UIManager.getLookAndFeel().getName());
 

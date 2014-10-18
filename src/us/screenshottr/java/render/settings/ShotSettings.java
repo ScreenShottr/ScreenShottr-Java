@@ -1,6 +1,5 @@
 package us.screenshottr.java.render.settings;
 
-import us.screenshottr.java.ShotURL;
 import us.screenshottr.java.render.ShotPainter;
 
 public class ShotSettings {
@@ -17,10 +16,10 @@ public class ShotSettings {
     }
 
     public void showSettings() {
-        settingsFrame.pack();
         settingsFrame.loadValues();
+        settingsFrame.revalidate();
+        settingsFrame.pack();
         settingsFrame.setVisible(true);
-        ShotURL.builder();
     }
 
     public void hideSettings() {
