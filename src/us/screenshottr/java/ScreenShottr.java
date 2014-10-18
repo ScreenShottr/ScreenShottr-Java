@@ -38,8 +38,6 @@ public class ScreenShottr implements IApplication {
         // Verify translucency
         ShotUtil.verifyTranslucencySupported();
 
-        Charles.applyFixes();
-
         // LNF
         ShotUtil.setLookAndFeel();
         ScreenShottr.LOGGER.info("LNF: " + UIManager.getLookAndFeel().getName());
