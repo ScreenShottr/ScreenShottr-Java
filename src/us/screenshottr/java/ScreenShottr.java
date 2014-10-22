@@ -12,9 +12,10 @@ import us.screenshottr.java.render.ShotPainter;
 
 public class ScreenShottr implements IApplication {
 
-    public static final Logger LOGGER = ShotLogger.getLogger();
     public static final String NAME = "ScreenShottr";
     public static final String VERSION = "2.0";
+    public static final File APP_FOLDER = ShotUtil.determineAppFolder();
+    public static final Logger LOGGER = ShotLogger.getLogger();
     public static final ScreenShottr APP = new ScreenShottr();
     //
     private final File appFolder;
@@ -26,7 +27,7 @@ public class ScreenShottr implements IApplication {
     }
 
     public ScreenShottr() {
-        this.appFolder = ShotUtil.determineAppFolder();
+        this.appFolder = APP_FOLDER;
         this.config = new Configuration(new File(appFolder, "config.properties"));
         this.painter = new ShotPainter(this);
     }

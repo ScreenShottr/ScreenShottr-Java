@@ -68,7 +68,11 @@ public class ShotUtil {
     }
 
     public static void handleError(Throwable ex) {
-        final String stacktrace = getStackTrace(ex);
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw, true);
+        ex.printStackTrace(pw);
+        final String stacktrace = sw.getBuffer().toString();
+
         ScreenShottr.LOGGER.log(Level.SEVERE, stacktrace);
         JOptionPane.showMessageDialog(new JFrame(),
                 "An error occured whilst making screenshot:\n"
@@ -76,13 +80,6 @@ public class ShotUtil {
                 "An error occured",
                 JOptionPane.ERROR_MESSAGE);
         ScreenShottr.APP.stop(1);
-    }
-
-    private static String getStackTrace(Throwable throwable) {
-        final StringWriter sw = new StringWriter();
-        final PrintWriter pw = new PrintWriter(sw, true);
-        throwable.printStackTrace(pw);
-        return sw.getBuffer().toString();
     }
 
     public static void putClipboard(String contents) {

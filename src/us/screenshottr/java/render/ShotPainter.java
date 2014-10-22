@@ -3,6 +3,8 @@ package us.screenshottr.java.render;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
@@ -23,6 +25,7 @@ public class ShotPainter implements Runnable, IStartStoppable {
     private final ScreenShottr app;
     private final JFrame parentFrame;
     private final ShotMouseAdapter mouseAdapter;
+    private final ShotKeyAdapter keyAdapter;
     private final ShotFullscreenPanel contentPanel;
     private final Timer timer;
     private final ShotSettings settings;
@@ -31,6 +34,7 @@ public class ShotPainter implements Runnable, IStartStoppable {
         this.app = app;
         this.parentFrame = new JFrame();
         this.mouseAdapter = new ShotMouseAdapter(this);
+        this.keyAdapter = new ShotKeyAdapter(this);
         this.settings = new ShotSettings(this);
         this.timer = new ShotRepaintTimer(this);
         this.contentPanel = new ShotFullscreenPanel(this);
@@ -52,12 +56,15 @@ public class ShotPainter implements Runnable, IStartStoppable {
         parentFrame.setBackground(new Color(0, 0, 0, 0.002f)); //TODO: Hacky hacky
         //
         parentFrame.setIconImage(ICON);
-        parentFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        parentFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         parentFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         parentFrame.setAlwaysOnTop(true);
         parentFrame.setCursor(DEFAULT_CURSOR);
         parentFrame.setLocationByPlatform(true);
         parentFrame.setResizable(false);
+        parentFrame.addMouseListener(mouseAdapter);
+        parentFrame.addMouseMotionListener(mouseAdapter);
+        parentFrame.addKeyListener(keyAdapter);
 
         // Content panel
         contentPanel.setLocation(0, 0);
@@ -65,16 +72,16 @@ public class ShotPainter implements Runnable, IStartStoppable {
         contentPanel.setMinimumSize(size);
         contentPanel.setLayout(null);
         contentPanel.setBackground(new Color(0, 0, 0, 0));
-        parentFrame.add(contentPanel);
-
-        // Mouse adapter
-        parentFrame.addMouseListener(mouseAdapter);
-        parentFrame.addMouseMotionListener(mouseAdapter);
+        contentPanel.repaint();
 
         // Start showing the frame
-        //parentFrame.pack();
-        //parentFrame.revalidate();
+        parentFrame.add(contentPanel);
+        parentFrame.pack();
         parentFrame.setVisible(true);
+
+        GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice dev = env.getDefaultScreenDevice();
+        //dev.setFullScreenWindow(parentFrame); // Untested stuff
 
         // Start repainting
         timer.start();

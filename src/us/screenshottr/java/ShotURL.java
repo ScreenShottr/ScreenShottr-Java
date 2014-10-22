@@ -8,7 +8,7 @@ import us.screenshottr.java.config.Configuration;
 
 public class ShotURL {
 
-    public static final String base = "screenshottr.us";
+    public static final String BASE = "screenshottr.us";
     private boolean https;
     private boolean encrypt;
 
@@ -41,7 +41,7 @@ public class ShotURL {
         final StringBuilder builder = new StringBuilder();
 
         builder.append(https ? "https://" : "http://");
-        builder.append(base);
+        builder.append(BASE);
         builder.append("/upload?return=json");
         builder.append(encrypt ? "" : "&unencrypted=true");
 

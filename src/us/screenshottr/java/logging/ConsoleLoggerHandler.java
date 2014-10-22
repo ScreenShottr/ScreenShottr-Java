@@ -9,8 +9,8 @@ public class ConsoleLoggerHandler extends Handler {
     public static final String LINE_SEPERATOR = System.getProperty("line.separator");
     private final Formatter formatter;
 
-    public ConsoleLoggerHandler() {
-        this.formatter = new ConsoleFormatter();
+    public ConsoleLoggerHandler(Formatter formatter) {
+        this.formatter = formatter;
     }
 
     @Override
